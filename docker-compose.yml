@@ -1,5 +1,5 @@
 services:
-  nginx:
+  angie:
     image: docker.angie.software/angie:latest
     container_name: angie
     volumes:
