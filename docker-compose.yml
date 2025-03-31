@@ -1,0 +1,45 @@
+services:
+  nginx:
+    image: docker.angie.software/angie:latest
+    container_name: angie
+    volumes:
+      - $PWD/angie.conf:/etc/angie/angie.conf
+      - $PWD/options-ssl-angie.conf:/etc/angie/options-ssl-angie.conf
+      - 3x-ui-aio-volume:/var/lib/angie/acme/
+    ports:
+      - "0.0.0.0:80:80"
+      - "0.0.0.0:443:443"
+    restart: unless-stopped
+    networks:
+      - 3x-ui-aio-network
+
+  3x-ui:
+    image: ghcr.io/mhsanaei/3x-ui:latest
+    container_name: 3x-ui
+    volumes:
+      - 3x-ui-aio-volume:/etc/x-ui/
+    environment:
+      XRAY_VMESS_AEAD_FORCED: "false"
+      X_UI_ENABLE_FAIL2BAN: "false"
+    tty: true
+    restart: unless-stopped
+    networks:
+      - 3x-ui-aio-network
+
+  authorization-stub:
+    image: ampetelin/authorization-stub
+    container_name: authorization-stub
+    environment:
+      HOST: "0.0.0.0"
+      PORT: "5000"
+    restart: unless-stopped
+    networks:
+      - 3x-ui-aio-network
+
+networks:
+  3x-ui-aio-network:
+    name: 3x-ui-aio-network
+
+volumes:
+  3x-ui-aio-volume:
+    name: 3x-ui-aio-volume
