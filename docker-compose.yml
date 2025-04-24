@@ -36,6 +36,30 @@ services:
     networks:
       - 3x-ui-aio-network
 
+    warp-socks:
+    image: monius/docker-warp-socks:latest
+    container_name: warp-socks
+    ports:
+      - "9091:9091"
+      # - target: 9091
+      #   published: 9091
+      #   mode: host
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN
+    sysctls:
+      net.ipv6.conf.all.disable_ipv6: 0
+      net.ipv4.conf.all.src_valid_mark: 1
+    healthcheck:
+      test: ["CMD", "curl", "-f", "https://www.cloudflare.com/cdn-cgi/trace"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    #restart: on-failure
+    restart: unless-stopped
+    networks:
+      - 3x-ui-aio-network
+
 networks:
   3x-ui-aio-network:
     name: 3x-ui-aio-network
